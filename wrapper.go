@@ -1,7 +1,6 @@
 package gorillawswrapper
 
 import (
-	"net/http"
 	"sync"
 	"time"
 
@@ -41,10 +40,6 @@ func NewWrapper(c *websocket.Conn) Wrapper {
 	return wrapper
 }
 
-func UpgradeWebSocket(upgrader websocket.Upgrader, w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
-	return upgrader.Upgrade(w, r, nil)
-}
-
 func (w *Wrapper) pingLoop() {
 	w.c.SetReadDeadline(time.Now().Add(pongWait))
 	w.c.SetPongHandler(func(string) error {
@@ -69,6 +64,7 @@ func (w *Wrapper) readLoop() {
 	for {
 		w.readMut.Lock()
 		t, message, err := w.c.ReadMessage()
+		w.c.SetReadDeadline(time.Now().Add(pongWait))
 		w.readMut.Unlock()
 		if err != nil {
 			w.Stop()
@@ -95,6 +91,14 @@ func (w *Wrapper) WriteMessage(messageType int, data []byte) error {
 		w.Stop()
 	}
 	return err
+}
+
+func (w *Wrapper) WriteTextMessage(message string) error {
+	return w.WriteMessage(websocket.TextMessage, []byte(message))
+}
+
+func (w *Wrapper) WriteBinaryMessage(data []byte) error {
+	return w.WriteMessage(websocket.BinaryMessage, data)
 }
 
 func (w *Wrapper) WriteJSON(v interface{}) error {
