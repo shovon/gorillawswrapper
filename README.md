@@ -8,7 +8,7 @@ The following are the boilerplates that this library removes:
 - pings and pongs
 - helper functions to write common message types to the clients.
 
-> This library is not a commentary about the utility of Gorilla WebSocket. There are very few libraries like Gorilla, and they should be cherished for what they have to offer.
+> This library is not a commentary about the utility of Gorilla WebSocket. There are very few libraries like Gorilla, and they should be cherished for what they have to offer. If you need fine-grained control over your WebSocket connection, then Gorilla is a fantastic library.
 > 
 > With all that said, there were boilerplates involved in writing software that utilizes Gorilla, and this library encapsulates the most common boilerplates that I had to write.
 
@@ -43,5 +43,7 @@ func main() {
       }
     }
   })
+
+  log.Fatal(http.ListenAndServe(":8080", nil))
 }
 ```
